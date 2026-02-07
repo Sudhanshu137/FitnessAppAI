@@ -14,7 +14,6 @@ The system follows **OAuth2 + JWT**, with centralized security and user synchron
 - Keycloak
 - Swagger / OpenAPI
 - MySQL / PostgreSQL
-- Docker
 - Maven
 
 ---
@@ -56,8 +55,6 @@ This project is designed to support **AI-powered fitness intelligence** on top o
 - API Gateway validates the token
 - Roles are extracted from JWT and enforced at Gateway / service level
 
-❌ No passwords are stored in application databases  
-❌ No custom login or signup APIs
 
 ---
 
@@ -89,12 +86,6 @@ This project is designed to support **AI-powered fitness intelligence** on top o
 - User synchronization
 - Routing to microservices
 - Single entry point
-- Swagger access via Gateway only
 
 ---
 
-## 📖 Swagger / API Documentation
-
-Swagger is enabled in each microservice
-
-Example:
