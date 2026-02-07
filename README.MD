@@ -95,6 +95,6 @@ This project is designed to support **AI-powered fitness intelligence** on top o
 
 ## 📖 Swagger / API Documentation
 
-Swagger is enabled in each microservice but accessed **only through API Gateway**.
+Swagger is enabled in each microservice
 
 Example:
