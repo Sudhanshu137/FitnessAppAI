@@ -28,6 +28,7 @@ public class UserService {
             userResponse.setLastName(existingUser.getLastName());
             userResponse.setCreatedAt(existingUser.getCreatedAt());
             userResponse.setUpdatedAt(existingUser.getUpdatedAt());
+            return userResponse;
         }
         User user = new User();
         user.setEmail(request.getEmail());
@@ -58,6 +59,7 @@ public class UserService {
         userResponse.setPassword(user.getPassword());
         userResponse.setId(user.getId());
         userResponse.setFirstName(user.getFirstName());
+        userResponse.setKeycloakId(user.getKeycloakId());
         userResponse.setLastName(user.getLastName());
         userResponse.setCreatedAt(user.getCreatedAt());
         userResponse.setUpdatedAt(user.getUpdatedAt());
@@ -66,6 +68,6 @@ public class UserService {
     }
 
     public Boolean existByUserId(String userid) {
-        return userRepository.existsByKeycloakId(userid);
+        return userRepository.existsById(userid);
     }
 }

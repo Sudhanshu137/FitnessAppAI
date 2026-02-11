@@ -1,0 +1,126 @@
+version: "3.8"
+
+services:
+
+  # ---------------- DATABASES ----------------
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fitness_user_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  # ---------------- CORE SERVICES ----------------
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.2
+    container_name: keycloak
+    restart: on-failure
+    ports:
+      - "8181:8080"
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    command: start-dev
+    volumes:
+      - keycloak_store:/opt/keycloak/data
+
+
+  configserver:
+    build: ./configserver
+    container_name: configserver
+    restart: on-failure
+    ports:
+      - "8085:8085"
+
+
+  eurekaserver:
+    build: ./eureka
+    container_name: eureka-server
+    restart: on-failure
+    ports:
+      - "8761:8761"
+    depends_on:
+      - configserver
+
+  # ---------------- MICROSERVICES ----------------
+
+  user-service:
+    build: ./userservice
+    container_name: user-service
+    restart: on-failure
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - configserver
+      - eurekaserver
+
+  activity-service:
+    build: ./activityservice
+    container_name: activity-service
+    restart: on-failure
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+      - rabbitmq
+      - configserver
+      - eurekaserver
+
+  ai-service:
+    build: ./aiservice
+    container_name: ai-service
+    restart: on-failure
+    ports:
+      - "8083:8083"
+    environment:
+      GEMINI_API_KEY: AIzaSyAGdnAgW_HBd1Mz6X-5x7s9ntXL3rmX9SI
+      GEMINI_API_URL: https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
+    depends_on:
+      - mongo
+      - rabbitmq
+      - configserver
+      - eurekaserver
+
+  api-gateway:
+    build: ./gateway
+    container_name: api-gateway
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak
+      - user-service
+      - activity-service
+      - ai-service
+
+# ---------------- VOLUMES ----------------
+
+volumes:
+  mysql_data:
+  mongo_data:
+  keycloak_store:
